@@ -12,7 +12,8 @@ class GuestController extends Controller
      */
     public function index()
     {
-        //
+        $guests = Guest::latest()->paginate(10);
+        return view('guests.index', compact('guests'));
     }
 
     /**
@@ -20,7 +21,7 @@ class GuestController extends Controller
      */
     public function create()
     {
-        //
+        return view('guests.create');
     }
 
     /**
@@ -28,7 +29,18 @@ class GuestController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'id_type' => 'required|in:KTP,Paspor',
+            'id_number' => 'required|string|unique:guests,id_number',
+            'phone_number' => 'nullable|string',
+            'email' => 'nullable|email',
+            'address' => 'nullable|string',
+        ]);
+
+        Guest::create($validated);
+
+        return redirect()->route('guests.index')->with('success', 'Data tamu berhasil ditambahkan!');
     }
 
     /**
@@ -36,7 +48,11 @@ class GuestController extends Controller
      */
     public function show(Guest $guest)
     {
-        //
+        $guest->load(['bookings' => function ($query) {
+            $query->with('rooms')->latest(); // Urutkan booking dari yang terbaru
+        }]);
+
+        return view('guests.show', compact('guest'));
     }
 
     /**
@@ -44,7 +60,7 @@ class GuestController extends Controller
      */
     public function edit(Guest $guest)
     {
-        //
+        return view('guests.edit', compact('guest'));
     }
 
     /**
@@ -52,7 +68,18 @@ class GuestController extends Controller
      */
     public function update(Request $request, Guest $guest)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'id_type' => 'required|in:KTP,Paspor',
+            'id_number' => 'required|string|unique:guests,id_number,' . $guest->id,
+            'phone_number' => 'nullable|string',
+            'email' => 'nullable|email',
+            'address' => 'nullable|string',
+        ]);
+
+        $guest->update($validated);
+
+        return redirect()->route('guests.index')->with('success', 'Data tamu berhasil diperbarui!');
     }
 
     /**
@@ -60,6 +87,7 @@ class GuestController extends Controller
      */
     public function destroy(Guest $guest)
     {
-        //
+        $guest->delete();
+        return redirect()->route('guests.index')->with('success', 'Data tamu berhasil dihapus!');
     }
 }

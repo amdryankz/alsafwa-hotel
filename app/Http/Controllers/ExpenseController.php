@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Expense;
+use App\Models\ExpenseCategory;
 use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
@@ -12,7 +13,8 @@ class ExpenseController extends Controller
      */
     public function index()
     {
-        //
+        $expenses = Expense::with('category')->latest()->paginate(15);
+        return view('expenses.index', compact('expenses'));
     }
 
     /**
@@ -20,7 +22,8 @@ class ExpenseController extends Controller
      */
     public function create()
     {
-        //
+        $categories = ExpenseCategory::orderBy('name')->get();
+        return view('expenses.create', compact('categories'));
     }
 
     /**
@@ -28,7 +31,15 @@ class ExpenseController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'expense_category_id' => 'required|exists:expense_categories,id',
+            'description' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+            'expense_date' => 'required|date',
+        ]);
+
+        Expense::create($validated);
+        return redirect()->route('expenses.index')->with('success', 'Data pengeluaran berhasil dicatat.');
     }
 
     /**
@@ -44,7 +55,8 @@ class ExpenseController extends Controller
      */
     public function edit(Expense $expense)
     {
-        //
+        $categories = ExpenseCategory::orderBy('name')->get();
+        return view('expenses.edit', compact('expense', 'categories'));
     }
 
     /**
@@ -52,7 +64,15 @@ class ExpenseController extends Controller
      */
     public function update(Request $request, Expense $expense)
     {
-        //
+        $validated = $request->validate([
+            'expense_category_id' => 'required|exists:expense_categories,id',
+            'description' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
+            'expense_date' => 'required|date',
+        ]);
+
+        $expense->update($validated);
+        return redirect()->route('expenses.index')->with('success', 'Data pengeluaran berhasil diperbarui.');
     }
 
     /**
@@ -60,6 +80,7 @@ class ExpenseController extends Controller
      */
     public function destroy(Expense $expense)
     {
-        //
+        $expense->delete();
+        return redirect()->route('expenses.index')->with('success', 'Data pengeluaran berhasil dihapus.');
     }
 }
