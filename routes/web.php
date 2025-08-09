@@ -17,7 +17,7 @@ use App\Http\Controllers\RoomTypeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Route::middleware('auth')->group(function () {
@@ -36,7 +36,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
         Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
         Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
-        Route::post('/bookings/{booking}/change-room', [App\Http\Controllers\BookingController::class, 'changeRoom'])->name('bookings.changeRoom');
+        Route::post('/bookings/{booking}/change-room', [BookingController::class, 'changeRoom'])->name('bookings.changeRoom');
     });
 
     Route::middleware('role:admin')->group(function () {
@@ -51,8 +51,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/financial/export', [ReportController::class, 'exportExcel'])->name('reports.financial.export');
     });
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->middleware(['auth', 'verified'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/calendar-events', [CalendarController::class, 'events']);
 });
