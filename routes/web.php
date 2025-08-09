@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/bookings/{booking}/adjustments', [BookingAdjustmentController::class, 'store'])->name('bookings.adjustments.store');
         Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
         Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+        Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+        Route::post('/bookings/{booking}/change-room', [App\Http\Controllers\BookingController::class, 'changeRoom'])->name('bookings.changeRoom');
     });
 
     Route::middleware('role:admin')->group(function () {

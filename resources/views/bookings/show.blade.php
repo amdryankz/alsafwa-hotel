@@ -20,26 +20,75 @@
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div x-data="{ modalOpen: false, oldRoomId: null, oldRoomNumber: '' }" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <div x-show="modalOpen" x-transition
+                    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+                    style="display: none;">
+                    <div @click.away="modalOpen = false" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+                        <h3 class="text-lg font-medium mb-4">Pindah Kamar dari #<span x-text="oldRoomNumber"></span>
+                        </h3>
+                        <form :action="'/bookings/' + {{ $booking->id }} + '/change-room'" method="POST">
+                            @csrf
+                            <input type="hidden" name="old_room_id" :value="oldRoomId">
+                            <div>
+                                <x-input-label for="new_room_id" class="mb-1">Pilih Kamar Baru yang
+                                    Tersedia:</x-input-label>
+                                <select name="new_room_id" id="new_room_id"
+                                    class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                    required>
+                                    <option value="">-- Pilih Kamar --</option>
+                                    @foreach ($availableRooms as $room)
+                                        <option value="{{ $room->id }}">#{{ $room->room_number }}
+                                            ({{ $room->roomType->name }})</option>
+                                    @endforeach
+                                </select>
+                                @if ($availableRooms->isEmpty())
+                                    <p class="text-sm text-red-500 mt-2">Tidak ada kamar lain yang tersedia saat ini.
+                                    </p>
+                                @endif
+                            </div>
+                            <div class="mt-6 flex justify-end space-x-4">
+                                <button type="button" @click="modalOpen = false"
+                                    class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">Batal</button>
+                                <x-primary-button>Konfirmasi Pindah</x-primary-button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
                 <div class="md:col-span-2 space-y-6">
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <div class="flex justify-between items-baseline">
                             <h3 class="text-lg font-medium text-gray-900">Rincian Tagihan</h3>
                             <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $booking->status == 'checked_in' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">{{ Str::title(str_replace('_', ' ', $booking->status)) }}</span>
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                 @if ($booking->status == 'booked') bg-blue-100 text-blue-800
+                                 @elseif($booking->status == 'checked_in') bg-yellow-100 text-yellow-800
+                                 @else bg-green-100 text-green-800 @endif">
+                                {{ Str::title(str_replace('_', ' ', $booking->status)) }}
+                            </span>
                         </div>
                         <div class="mt-4 border-t border-gray-200">
                             <dl class="divide-y divide-gray-200">
                                 @foreach ($booking->rooms as $room)
-                                    <div class="py-3 flex justify-between text-sm">
+                                    <div class="py-3 flex justify-between items-center text-sm">
                                         <dt class="text-gray-500">
                                             Sewa Kamar #{{ $room->room_number }} ({{ $room->roomType->name }})<br>
                                             <span class="text-xs">{{ $nights }} Malam x Rp
                                                 {{ number_format($room->pivot->price_at_booking) }}</span>
                                         </dt>
-                                        <dd class="text-gray-900">Rp
-                                            {{ number_format($room->pivot->price_at_booking * $nights) }}</dd>
+                                        <div class="flex items-center">
+                                            <dd class="text-gray-900 mr-4">Rp
+                                                {{ number_format($room->pivot->price_at_booking * $nights) }}</dd>
+                                            @if ($booking->status == 'checked_in')
+                                                <button
+                                                    @click="modalOpen = true; oldRoomId = {{ $room->id }}; oldRoomNumber = '{{ $room->room_number }}'"
+                                                    class="no-print text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200">
+                                                    Pindah
+                                                </button>
+                                            @endif
+                                        </div>
                                     </div>
                                 @endforeach
                                 @foreach ($booking->services as $service)
@@ -78,7 +127,7 @@
                                     <dd>Rp {{ number_format($booking->paid_amount) }}</dd>
                                 </div>
                                 <div
-                                    class="py-3 flex justify-between text-base font-bold {{ $booking->grand_total - $booking->paid_amount > 0 ? 'text-red-600' : 'text-green-600' }}">
+                                    class="py-3 flex justify-between text-base font-bold {{ $booking->grand_total - $booking->paid_amount > 0.01 ? 'text-red-600' : 'text-green-600' }}">
                                     <dt>Sisa Tagihan</dt>
                                     <dd>Rp {{ number_format($booking->grand_total - $booking->paid_amount) }}</dd>
                                 </div>
@@ -136,7 +185,6 @@
                             <x-primary-button class="mt-4 w-full justify-center">Update</x-primary-button>
                         </form>
                     </div>
-
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Tambah Layanan</h3>
                         <form action="{{ route('bookings.services.store', $booking) }}" method="POST">
@@ -151,20 +199,20 @@
                             <x-primary-button class="mt-4 w-full justify-center">Tambah</x-primary-button>
                         </form>
                     </div>
-
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Catat Pembayaran</h3>
                         <form action="{{ route('bookings.payments.store', $booking) }}" method="POST">
                             @csrf
-                            <x-text-input name="amount" type="number" placeholder="Jumlah Bayar" class="w-full"
-                                required :value="max(0, $booking->grand_total - $booking->paid_amount)" />
+                            <x-text-input name="amount" type="number" placeholder="Jumlah Bayar" step="0.01"
+                                class="w-full" required :value="max(0, $booking->grand_total - $booking->paid_amount)" />
                             <div class="mt-2">
                                 <x-input-label for="payment_date">Tanggal Bayar</x-input-label>
-                                <x-text-input id="payment_date" name="payment_date" type="datetime-local" class="w-full"
-                                    required :value="now()->format('Y-m-d\TH:i')" />
+                                <x-text-input id="payment_date" name="payment_date" type="datetime-local"
+                                    class="w-full" required :value="now()->format('Y-m-d\TH:i')" />
                             </div>
                             <select name="payment_method"
-                                class="mt-2 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                class="mt-2 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                required>
                                 <option value="cash">Tunai (Cash)</option>
                                 <option value="transfer">Transfer Bank</option>
                                 <option value="qris">QRIS</option>
@@ -174,7 +222,6 @@
                             <x-primary-button class="mt-4 w-full justify-center">Bayar</x-primary-button>
                         </form>
                     </div>
-
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Aksi Lainnya</h3>
                         <div class="space-y-4">
@@ -182,14 +229,26 @@
                                 class="w-full justify-center inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-500">
                                 Cetak Invoice
                             </a>
-                            <form action="{{ route('bookings.checkout', $booking) }}" method="POST"
-                                onsubmit="return confirm('Anda yakin ingin melakukan check-out untuk tamu ini?')">
-                                @csrf
-                                <button type="submit"
-                                    class="w-full justify-center inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500">
-                                    Proses Check-out
-                                </button>
-                            </form>
+                            @if ($booking->status == 'booked')
+                                <form action="{{ route('bookings.cancel', $booking->id) }}" method="POST"
+                                    onsubmit="return confirm('Anda yakin ingin MEMBATALKAN reservasi ini?')">
+                                    @csrf
+                                    <button type="submit"
+                                        class="w-full justify-center inline-flex items-center px-4 py-2 bg-orange-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-400">
+                                        Batalkan Reservasi
+                                    </button>
+                                </form>
+                            @endif
+                            @if ($booking->status == 'checked_in')
+                                <form action="{{ route('bookings.checkout', $booking) }}" method="POST"
+                                    onsubmit="return confirm('Anda yakin ingin melakukan check-out untuk tamu ini?')">
+                                    @csrf
+                                    <button type="submit"
+                                        class="w-full justify-center inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500">
+                                        Proses Check-out
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>

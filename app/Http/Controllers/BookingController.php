@@ -125,31 +125,9 @@ class BookingController extends Controller
         $booking->load(['guest', 'rooms.roomType', 'services', 'payments']);
         $nights = $this->calculateNights($booking->check_in_date, $booking->check_out_date);
 
-        return view('bookings.show', compact('booking', 'nights'));
-    }
+        $availableRooms = Room::where('status', 'available')->with('roomType')->get();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Booking $booking)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Booking $booking)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Booking $booking)
-    {
-        //
+        return view('bookings.show', compact('booking', 'nights', 'availableRooms'));
     }
 
     /**
@@ -185,6 +163,20 @@ class BookingController extends Controller
     }
 
     /**
+     * Membatalkan sebuah reservasi.
+     */
+    public function cancel(Booking $booking)
+    {
+        if ($booking->status !== 'booked') {
+            return back()->with('error', 'Hanya reservasi yang belum check-in yang bisa dibatalkan.');
+        }
+
+        $booking->update(['status' => 'cancelled']);
+
+        return redirect()->route('bookings.index')->with('success', 'Reservasi berhasil dibatalkan.');
+    }
+
+    /**
      * Menampilkan halaman invoice yang siap cetak.
      */
     public function print(Booking $booking)
@@ -201,5 +193,41 @@ class BookingController extends Controller
         $checkOutDate = Carbon::parse($checkOut)->startOfDay();
         $nights = $checkInDate->diffInDays($checkOutDate);
         return ($nights <= 0) ? 1 : $nights;
+    }
+
+    public function changeRoom(Request $request, Booking $booking)
+    {
+        $validated = $request->validate([
+            'old_room_id' => 'required|exists:rooms,id',
+            'new_room_id' => 'required|exists:rooms,id|different:old_room_id',
+        ]);
+
+        if ($booking->status !== 'checked_in') {
+            return back()->with('error', 'Tamu tidak dalam status check-in.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $oldRoom = Room::find($validated['old_room_id']);
+            $newRoom = Room::with('roomType')->find($validated['new_room_id']);
+
+            if ($newRoom->status !== 'available') {
+                return back()->with('error', "Kamar #{$newRoom->room_number} sudah tidak tersedia.");
+            }
+
+            $oldRoom->update(['status' => 'available']);
+
+            $newRoom->update(['status' => 'occupied']);
+
+            $booking->rooms()->detach($oldRoom->id);
+
+            $booking->rooms()->attach($newRoom->id, ['price_at_booking' => $newRoom->roomType->price_per_night]);
+
+            DB::commit();
+            return back()->with('success', "Tamu berhasil dipindahkan dari kamar #{$oldRoom->room_number} ke #{$newRoom->room_number}.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan saat proses pindah kamar: ' . $e->getMessage());
+        }
     }
 }
