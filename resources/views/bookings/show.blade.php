@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-white">
             Detail Transaksi #{{ str_pad($booking->id, 6, '0', STR_PAD_LEFT) }}
         </h2>
     </x-slot>
@@ -40,7 +40,8 @@
                                     <option value="">-- Pilih Kamar --</option>
                                     @foreach ($availableRooms as $room)
                                         <option value="{{ $room->id }}">#{{ $room->room_number }}
-                                            ({{ $room->roomType->name }})</option>
+                                            ({{ $room->roomType->name }})
+                                        </option>
                                     @endforeach
                                 </select>
                                 @if ($availableRooms->isEmpty())
@@ -94,7 +95,8 @@
                                 @foreach ($booking->services as $service)
                                     <div class="py-3 flex justify-between text-sm">
                                         <dt class="text-gray-500">{{ $service->service_name }}
-                                            (x{{ $service->quantity }})</dt>
+                                            (x{{ $service->quantity }})
+                                        </dt>
                                         <dd class="text-gray-900">Rp
                                             {{ number_format($service->price * $service->quantity) }}</dd>
                                     </div>
