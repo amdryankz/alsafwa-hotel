@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\BookingAdjustmentController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BookingPaymentController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomTypeController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +33,8 @@ Route::middleware('auth')->group(function () {
         Route::resource('bookings', BookingController::class);
         Route::get('/bookings/{booking}/print', [BookingController::class, 'print'])->name('bookings.print');
         Route::post('/bookings/{booking}/adjustments', [BookingAdjustmentController::class, 'store'])->name('bookings.adjustments.store');
+        Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
+        Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
     });
 
     Route::middleware('role:admin')->group(function () {
@@ -47,6 +51,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware(['auth', 'verified'])->name('dashboard');
+
+    Route::get('/calendar-events', [CalendarController::class, 'events']);
 });
 
 require __DIR__ . '/auth.php';

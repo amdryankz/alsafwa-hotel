@@ -28,35 +28,50 @@
 
             <div class="mt-8 bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Grafik Pendapatan (7 Hari Terakhir)</h3>
-                    <canvas id="revenueChart"></canvas>
+                    <div class="flex items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Kalender Hunian</h3>
+                        <div class="ml-4 flex items-center space-x-4 text-sm">
+                            <div class="flex items-center">
+                                <span class="h-3 w-3 rounded-full" style="background-color: #3788d8;"></span>
+                                <span class="ml-2">Reservasi</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="h-3 w-3 rounded-full" style="background-color: #f59e0b;"></span>
+                                <span class="ml-2">Checked-in</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="calendar"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+
     <script>
-        const ctx = document.getElementById('revenueChart');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: @json($revenueChart['labels']),
-                datasets: [{
-                    label: 'Pendapatan',
-                    data: @json($revenueChart['data']),
-                    fill: true,
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth', // Tampilan awal bulan
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    // Tambahkan opsi tampilan minggu dan hari
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: '/calendar-events',
+                locale: 'id',
+                timeZone: 'Asia/Jakarta',
+                // Buka URL di tab baru saat event diklik
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault(); // Mencegah browser mengikuti link default
+                    if (info.event.url) {
+                        window.open(info.event.url, "_blank"); // Buka di tab baru
                     }
                 }
-            }
+            });
+            calendar.render();
         });
     </script>
 </x-app-layout>

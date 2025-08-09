@@ -25,6 +25,9 @@
                         <x-nav-link :href="route('guests.index')" :active="request()->routeIs('guests.*')">
                             {{ __('Data Tamu') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('reservations.create')" :active="request()->routeIs('reservations.create')">
+                            Reservasi
+                        </x-nav-link>
                     </div>
                 @endif
 
