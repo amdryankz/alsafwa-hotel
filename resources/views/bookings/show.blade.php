@@ -232,6 +232,14 @@
                                 Cetak Invoice
                             </a>
                             @if ($booking->status == 'booked')
+                                <form action="{{ route('bookings.confirmCheckIn', $booking->id) }}" method="POST"
+                                    onsubmit="return confirm('Konfirmasi kedatangan dan check-in untuk tamu ini?')">
+                                    @csrf
+                                    <button type="submit"
+                                        class="w-full justify-center inline-flex items-center px-4 py-2 bg-green-600 border-transparent rounded-md ...">
+                                        Konfirmasi Check-in
+                                    </button>
+                                </form>
                                 <form action="{{ route('bookings.cancel', $booking->id) }}" method="POST"
                                     onsubmit="return confirm('Anda yakin ingin MEMBATALKAN reservasi ini?')">
                                     @csrf

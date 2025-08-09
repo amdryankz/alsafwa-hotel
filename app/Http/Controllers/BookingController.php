@@ -230,4 +230,28 @@ class BookingController extends Controller
             return back()->with('error', 'Terjadi kesalahan saat proses pindah kamar: ' . $e->getMessage());
         }
     }
+
+    public function confirmCheckIn(Booking $booking)
+    {
+        if ($booking->status !== 'booked') {
+            return back()->with('error', 'Hanya reservasi yang bisa dikonfirmasi untuk check-in.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // 1. Ubah status booking
+            $booking->update(['status' => 'checked_in']);
+
+            // 2. Ubah status semua kamar terkait menjadi 'occupied'
+            foreach ($booking->rooms as $room) {
+                $room->update(['status' => 'occupied']);
+            }
+
+            DB::commit();
+            return back()->with('success', 'Tamu berhasil check-in.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
 }
