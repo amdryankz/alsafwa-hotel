@@ -122,8 +122,10 @@ class BookingController extends Controller
      */
     public function show(Booking $booking)
     {
-        $booking->load(['guest', 'rooms.roomType', 'services']);
-        return view('bookings.show', compact('booking'));
+        $booking->load(['guest', 'rooms.roomType', 'services', 'payments']);
+        $nights = $this->calculateNights($booking->check_in_date, $booking->check_out_date);
+
+        return view('bookings.show', compact('booking', 'nights'));
     }
 
     /**
@@ -156,7 +158,7 @@ class BookingController extends Controller
     public function checkout(Request $request, Booking $booking)
     {
         // Validasi: Pastikan tagihan sudah lunas sebelum checkout
-        $balance = $booking->total_amount - $booking->paid_amount;
+        $balance = $booking->grand_total - $booking->paid_amount;
         if ($balance > 0) {
             return back()->with('error', 'Check-out gagal! Tagihan belum lunas. Sisa tagihan: Rp ' . number_format($balance));
         }
@@ -187,7 +189,17 @@ class BookingController extends Controller
      */
     public function print(Booking $booking)
     {
-        $booking->load(['guest', 'rooms.roomType', 'services']);
-        return view('bookings.print', compact('booking'));
+        $booking->load(['guest', 'rooms.roomType', 'services', 'payments']);
+        $nights = $this->calculateNights($booking->check_in_date, $booking->check_out_date);
+
+        return view('bookings.print', compact('booking', 'nights'));
+    }
+
+    private function calculateNights($checkIn, $checkOut)
+    {
+        $checkInDate = Carbon::parse($checkIn)->startOfDay();
+        $checkOutDate = Carbon::parse($checkOut)->startOfDay();
+        $nights = $checkInDate->diffInDays($checkOutDate);
+        return ($nights <= 0) ? 1 : $nights;
     }
 }

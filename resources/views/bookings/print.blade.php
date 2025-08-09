@@ -1,6 +1,6 @@
 @extends('layouts.print')
 
-@section('title', 'Invoice #' . $booking->id)
+@section('title', 'Invoice #' . str_pad($booking->id, 6, '0', STR_PAD_LEFT))
 
 @section('content')
     <div class="no-print mb-8 text-center">
@@ -17,7 +17,6 @@
         <div>
             <h1 class="text-2xl font-bold text-gray-800">Hotel Hebat</h1>
             <p class="text-gray-500">Jl. Pembangunan No. 123, Medan</p>
-            <p class="text-gray-500">telepon: (061) 123-4567</p>
         </div>
         <div class="text-right">
             <h2 class="text-2xl font-bold text-gray-700">INVOICE</h2>
@@ -29,13 +28,10 @@
         <div>
             <h3 class="font-bold text-gray-700">Ditagihkan Kepada:</h3>
             <p>{{ $booking->guest->name }}</p>
-            <p>{{ $booking->guest->address ?? 'Alamat tidak tersedia' }}</p>
-            <p>{{ $booking->guest->phone_number ?? '' }}</p>
         </div>
         <div class="text-right">
-            <p><strong>Tanggal Invoice:</strong> {{ now()->format('d M Y') }}</p>
-            <p><strong>Tanggal Check-in:</strong> {{ \Carbon\Carbon::parse($booking->check_in_date)->format('d M Y') }}</p>
-            <p><strong>Tanggal Check-out:</strong>
+            <p><strong>Tgl Check-in:</strong> {{ \Carbon\Carbon::parse($booking->check_in_date)->format('d M Y') }}</p>
+            <p><strong>Tgl Check-out:</strong>
                 {{ $booking->check_out_date ? \Carbon\Carbon::parse($booking->check_out_date)->format('d M Y') : 'N/A' }}
             </p>
         </div>
@@ -50,32 +46,20 @@
                 </tr>
             </thead>
             <tbody>
-                @php
-                    $checkInDate = \Carbon\Carbon::parse($booking->check_in_date)->startOfDay();
-                    $checkOutDate = \Carbon\Carbon::parse($booking->check_out_date)->startOfDay();
-
-                    $nights = $checkInDate->diffInDays($checkOutDate);
-
-                    if ($nights <= 0) {
-                        $nights = 1;
-                    }
-                @endphp
-
                 @foreach ($booking->rooms as $room)
-                    <td class="px-2 py-2">
-                        <div>Sewa Kamar #{{ $room->room_number }} ({{ $room->roomType->name }})</div>
-                        <div class="text-xs text-gray-500">{{ $nights }} Malam x Rp
-                            {{ number_format($room->pivot->price_at_booking) }}</div>
-                    </td>
-                    <td class="px-2 py-2 text-right">Rp
-                        {{ number_format($room->pivot->price_at_booking * $nights) }}</td>
+                    <tr class="border-b">
+                        <td class="p-3">
+                            Sewa Kamar #{{ $room->room_number }} ({{ $room->roomType->name }})
+                            <span class="block text-xs text-gray-500">{{ $nights }} Malam x Rp
+                                {{ number_format($room->pivot->price_at_booking) }}</span>
+                        </td>
+                        <td class="p-3 text-right">Rp {{ number_format($room->pivot->price_at_booking * $nights) }}</td>
+                    </tr>
                 @endforeach
                 @foreach ($booking->services as $service)
-                    <tr>
-                        <td class="px-2 py-2">{{ $service->service_name }} (x{{ $service->quantity }})
-                        </td>
-                        <td class="px-2 py-2 text-right">Rp
-                            {{ number_format($service->price * $service->quantity) }}</td>
+                    <tr class="border-b">
+                        <td class="p-3">{{ $service->service_name }} x {{ $service->quantity }}</td>
+                        <td class="p-3 text-right">Rp {{ number_format($service->price * $service->quantity) }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -83,30 +67,74 @@
     </section>
 
     <section class="flex justify-end mb-8">
-        <div class="w-full md:w-1/2">
+        <div class="w-full md:w-2/3">
             <table class="w-full">
                 <tbody>
-                    <tr class="font-semibold">
+                    <tr>
                         <td class="p-2">Subtotal</td>
                         <td class="p-2 text-right">Rp {{ number_format($booking->total_amount) }}</td>
                     </tr>
-                    <tr class="font-semibold">
-                        <td class="p-2">Sudah Dibayar</td>
-                        <td class="p-2 text-right text-green-600">- Rp {{ number_format($booking->paid_amount) }}</td>
-                    </tr>
-                    <tr class="font-bold text-xl bg-gray-200">
-                        <td class="p-3">Sisa Tagihan</td>
-                        <td class="p-3 text-right">Rp {{ number_format($booking->total_amount - $booking->paid_amount) }}
-                        </td>
+                    @if ($booking->discount > 0)
+                        <tr>
+                            <td class="p-2">Diskon</td>
+                            <td class="p-2 text-right">- Rp {{ number_format($booking->discount) }}</td>
+                        </tr>
+                    @endif
+                    @if ($booking->tax_percentage > 0)
+                        <tr>
+                            <td class="p-2">PPN ({{ $booking->tax_percentage }}%)</td>
+                            <td class="p-2 text-right">+ Rp
+                                {{ number_format(($booking->total_amount - $booking->discount) * ($booking->tax_percentage / 100)) }}
+                            </td>
+                        </tr>
+                    @endif
+                    <tr class="font-bold text-lg border-t-2 border-gray-300">
+                        <td class="p-2">Grand Total</td>
+                        <td class="p-2 text-right">Rp {{ number_format($booking->grand_total) }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </section>
 
-    <footer class="text-center text-gray-500 border-t pt-4">
-        <p>Terima kasih telah menginap di Hotel Hebat.</p>
-        <p>Pembayaran dapat dilakukan melalui transfer ke rekening BCA 123-456-7890 a/n PT Hotel Sejahtera.</p>
-    </footer>
+    <section>
+        <h3 class="font-bold text-gray-700 mb-2">Rincian Pembayaran</h3>
+        <table class="w-full text-left text-sm">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="p-2">Tanggal</th>
+                    <th class="p-2">Metode</th>
+                    <th class="p-2 text-right">Jumlah</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($booking->payments as $payment)
+                    <tr class="border-b">
+                        <td class="p-2">{{ \Carbon\Carbon::parse($payment->payment_date)->format('d M Y') }}</td>
+                        <td class="p-2">{{ Str::title($payment->payment_method) }}</td>
+                        <td class="p-2 text-right">Rp {{ number_format($payment->amount) }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="p-2 text-center text-gray-500">Belum ada pembayaran</td>
+                    </tr>
+                @endforelse
+            </tbody>
+            <tfoot class="font-bold">
+                <tr>
+                    <td colspan="2" class="p-2 border-t-2 border-gray-300">Total Dibayar</td>
+                    <td class="p-2 border-t-2 border-gray-300 text-right">Rp {{ number_format($booking->paid_amount) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="p-2">Sisa Tagihan</td>
+                    <td class="p-2 text-right">Rp {{ number_format($booking->grand_total - $booking->paid_amount) }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </section>
 
+    <footer class="text-center text-gray-500 border-t pt-4 mt-8">
+        <p>Terima kasih telah menginap di Hotel Hebat.</p>
+    </footer>
 @endsection

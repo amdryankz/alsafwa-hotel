@@ -36,4 +36,21 @@ class Booking extends Model
             ->withPivot('price_at_booking')
             ->withTimestamps();
     }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function getPaidAmountAttribute()
+    {
+        return $this->payments->sum('amount');
+    }
+
+    public function getGrandTotalAttribute()
+    {
+        $subtotalAfterDiscount = $this->total_amount - $this->discount;
+        $taxAmount = $subtotalAfterDiscount * ($this->tax_percentage / 100);
+        return $subtotalAfterDiscount + $taxAmount;
+    }
 }

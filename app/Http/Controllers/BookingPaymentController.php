@@ -12,25 +12,24 @@ class BookingPaymentController extends Controller
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:1',
-            'payment_method' => 'required|string'
+            'payment_method' => 'required|string',
+            'payment_date' => 'required|date'
         ]);
 
-        $balance = $booking->total_amount - $booking->paid_amount;
+        $balance = $booking->grand_total - $booking->paid_amount;
 
-        // Validasi agar pembayaran tidak melebihi sisa tagihan
         if ($validated['amount'] > $balance) {
             throw ValidationException::withMessages([
                 'amount' => 'Jumlah pembayaran melebihi sisa tagihan (Rp ' . number_format($balance) . ').'
             ]);
         }
 
-        // 1. Tambahkan jumlah pembayaran
-        $booking->increment('paid_amount', $validated['amount']);
-
-        // 2. Update metode pembayaran (jika perlu)
-        if (is_null($booking->payment_method)) {
-            $booking->update(['payment_method' => $validated['payment_method']]);
-        }
+        // Buat catatan pembayaran baru yang terhubung dengan booking ini
+        $booking->payments()->create([
+            'amount' => $validated['amount'],
+            'payment_method' => $validated['payment_method'],
+            'payment_date' => $validated['payment_date'],
+        ]);
 
         return back()->with('success', 'Pembayaran berhasil dicatat.');
     }

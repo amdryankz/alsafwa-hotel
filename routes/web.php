@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookingAdjustmentController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BookingPaymentController;
 use App\Http\Controllers\BookingServiceController;
@@ -29,6 +30,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/bookings/{booking}/checkout', [BookingController::class, 'checkout'])->name('bookings.checkout');
         Route::resource('bookings', BookingController::class);
         Route::get('/bookings/{booking}/print', [BookingController::class, 'print'])->name('bookings.print');
+        Route::post('/bookings/{booking}/adjustments', [BookingAdjustmentController::class, 'store'])->name('bookings.adjustments.store');
     });
 
     Route::middleware('role:admin')->group(function () {
