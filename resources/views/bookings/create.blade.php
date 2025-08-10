@@ -22,7 +22,7 @@
 
                         <div class="mt-4">
                             <x-input-label for="guest_id" :value="__('Pilih Tamu')" />
-                            <select name="guest_id" id="guest_id"
+                            <select name="guest_id" id="select-guest"
                                 class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
                                 <option value="">-- Pilih dari data tamu yang ada --</option>
                                 @foreach ($guests as $guest)
@@ -89,4 +89,10 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            new TomSelect('#select-guest');
+        });
+    </script>
 </x-app-layout>

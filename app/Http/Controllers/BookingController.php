@@ -16,17 +16,25 @@ class BookingController extends Controller
      */
     public function index(Request $request)
     {
-        $status = $request->query('status', 'active'); // Default ke 'active'
+        $status = $request->query('status', 'active');
+
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
 
         if ($status == 'history') {
-            // Tampilkan riwayat (checked_out)
-            $bookings = Booking::with(['guest', 'rooms'])
-                ->where('status', 'checked_out')
-                ->latest('check_out_date')
-                ->paginate(15);
-            $pageTitle = 'Riwayat Transaksi (Checked-Out)';
+            $query = Booking::with(['guest', 'rooms'])
+                ->where('status', 'checked_out');
+
+            if ($startDate && $endDate) {
+                $query->whereBetween('check_out_date', [
+                    Carbon::parse($startDate)->startOfDay(),
+                    Carbon::parse($endDate)->endOfDay()
+                ]);
+            }
+
+            $bookings = $query->latest('check_out_date')->paginate(15);
+            $pageTitle = 'Riwayat Transaksi';
         } else {
-            // Tampilkan yang aktif (booked atau checked_in)
             $bookings = Booking::with(['guest', 'rooms'])
                 ->whereIn('status', ['checked_in', 'booked'])
                 ->latest()
@@ -37,9 +45,12 @@ class BookingController extends Controller
         return view('bookings.index', [
             'bookings' => $bookings,
             'pageTitle' => $pageTitle,
-            'currentStatus' => $status
+            'currentStatus' => $status,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

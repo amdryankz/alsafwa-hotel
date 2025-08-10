@@ -10,10 +10,18 @@ class GuestController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $guests = Guest::latest()->paginate(10);
-        return view('guests.index', compact('guests'));
+        $search = $request->query('search');
+
+        $guests = Guest::when($search, function ($query, $search) {
+            return $query->where('name', 'like', "%{$search}%")
+                ->orWhere('id_number', 'like', "%{$search}%");
+        })
+            ->latest()
+            ->paginate(10);
+
+        return view('guests.index', compact('guests', 'search'));
     }
 
     /**

@@ -12,6 +12,15 @@
                     <a href="{{ route('guests.create') }}"
                         class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">Tambah
                         Tamu Baru</a>
+                    <div class="mt-4 mb-4">
+                        <form method="GET" action="{{ route('guests.index') }}">
+                            <div class="flex">
+                                <x-text-input type="text" name="search" class="w-full"
+                                    placeholder="Cari nama atau no. identitas..." :value="$search ?? ''" />
+                                <x-primary-button class="ml-2">Cari</x-primary-button>
+                            </div>
+                        </form>
+                    </div>
 
                     @if (session('success'))
                         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative my-4"
@@ -71,7 +80,7 @@
                         </tbody>
                     </table>
                     <div class="mt-4">
-                        {{ $guests->links() }}
+                        {{ $guests->appends(['search' => $search])->links() }}
                     </div>
                 </div>
             </div>

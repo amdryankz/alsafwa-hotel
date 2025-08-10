@@ -19,8 +19,8 @@
 
                         <div class="mt-4">
                             <x-input-label for="guest_id" value="Pilih Tamu" />
-                            <select name="guest_id" id="guest_id" class="block mt-1 w-full border-gray-300 rounded-md"
-                                required>
+                            <select name="guest_id" id="select-guest"
+                                class="block mt-1 w-full border-gray-300 rounded-md" required>
                                 <option value="">-- Pilih dari data tamu --</option>
                                 @foreach ($guests as $guest)
                                     <option value="{{ $guest->id }}" @selected(old('guest_id') == $guest->id)>
@@ -72,4 +72,10 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            new TomSelect('#select-guest');
+        });
+    </script>
 </x-app-layout>
