@@ -51,7 +51,7 @@
                             {{ __('Data Kamar') }}
                         </x-nav-link>
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
-                            {{ __('Data Karyawan') }}
+                            {{ __('Akun Karyawan') }}
                         </x-nav-link>
                         <x-nav-link :href="route('activity-log.index')" :active="request()->routeIs('activity-log.*')">
                             {{ __('Log Aktivitas') }}

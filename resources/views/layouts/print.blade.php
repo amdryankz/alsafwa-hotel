@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="UTF-8">
@@ -7,15 +7,12 @@
     <title>@yield('title', 'Invoice')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* CSS khusus untuk media cetak */
         @media print {
 
-            /* Sembunyikan tombol saat mencetak */
             .no-print {
                 display: none !important;
             }
 
-            /* Pastikan background dan warna teks tercetak */
             body {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;

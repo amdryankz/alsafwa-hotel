@@ -7,10 +7,6 @@
         <button onclick="window.print()" class="bg-blue-500 text-white px-4 py-2 rounded shadow-md hover:bg-blue-600">
             Cetak Invoice
         </button>
-        <a href="{{ route('bookings.show', $booking->id) }}"
-            class="bg-gray-500 text-white px-4 py-2 rounded shadow-md hover:bg-gray-600 ml-2">
-            Kembali ke Detail
-        </a>
     </div>
 
     <header class="flex justify-between items-center mb-8 border-b pb-4">
