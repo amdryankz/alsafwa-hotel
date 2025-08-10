@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\BookingAdjustmentController;
 use App\Http\Controllers\BookingController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomTypeController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -43,6 +45,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::resource('room-types', RoomTypeController::class);
         Route::resource('rooms', RoomController::class);
+        Route::resource('users', UserController::class);
+        Route::get('/activity-log', [ActivityLogController::class, 'index'])->name('activity-log.index');
     });
 
     Route::middleware(['role:owner,accountant,admin'])->group(function () {

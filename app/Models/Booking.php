@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Booking extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $guarded = [];
 
@@ -52,5 +54,18 @@ class Booking extends Model
         $subtotalAfterDiscount = $this->total_amount - $this->discount;
         $taxAmount = $subtotalAfterDiscount * ($this->tax_percentage / 100);
         return $subtotalAfterDiscount + $taxAmount;
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            // Log hanya akan dibuat jika nilai kolom ini berubah
+            ->logOnly(['status', 'discount', 'tax_percentage'])
+            // Tampilkan log jika ada atribut yang "kotor" atau berubah
+            ->logOnlyDirty()
+            // Pesan log yang akan ditampilkan
+            ->setDescriptionForEvent(fn(string $eventName) => "Transaksi Booking #{$this->id} telah di-{$eventName}")
+            // Mengelompokkan log berdasarkan nama
+            ->useLogName('Transaksi');
     }
 }

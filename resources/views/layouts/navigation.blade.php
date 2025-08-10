@@ -28,17 +28,6 @@
                     </div>
                 @endif
 
-                @if (auth()->user()->role === 'admin')
-                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                        <x-nav-link :href="route('room-types.index')" :active="request()->routeIs('room-types.*')">
-                            {{ __('Tipe Kamar') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('rooms.index')" :active="request()->routeIs('rooms.*')">
-                            {{ __('Data Kamar') }}
-                        </x-nav-link>
-                    </div>
-                @endif
-
                 @if (auth()->user()->role === 'owner' || auth()->user()->role === 'accountant' || auth()->user()->role === 'admin')
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                         <x-nav-link :href="route('expense-categories.index')" :active="request()->routeIs('expense-categories.*')">
@@ -49,6 +38,23 @@
                         </x-nav-link>
                         <x-nav-link :href="route('reports.financial')" :active="request()->routeIs('reports.financial')">
                             {{ __('Laporan') }}
+                        </x-nav-link>
+                    </div>
+                @endif
+
+                @if (auth()->user()->role === 'admin')
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link :href="route('room-types.index')" :active="request()->routeIs('room-types.*')">
+                            {{ __('Tipe Kamar') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('rooms.index')" :active="request()->routeIs('rooms.*')">
+                            {{ __('Data Kamar') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
+                            {{ __('Data Karyawan') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('activity-log.index')" :active="request()->routeIs('activity-log.*')">
+                            {{ __('Log Aktivitas') }}
                         </x-nav-link>
                     </div>
                 @endif
