@@ -236,7 +236,7 @@
                                     onsubmit="return confirm('Konfirmasi kedatangan dan check-in untuk tamu ini?')">
                                     @csrf
                                     <button type="submit"
-                                        class="w-full justify-center inline-flex items-center px-4 py-2 bg-green-600 border-transparent rounded-md ...">
+                                        class="w-full justify-center inline-flex items-center px-4 py-2 bg-green-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-400">
                                         Konfirmasi Check-in
                                     </button>
                                 </form>

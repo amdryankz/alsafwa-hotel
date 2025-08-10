@@ -20,6 +20,12 @@
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
 
+                        <div class="flex items-center justify-end mt-4">
+                            <a href="{{ route('expense-categories.index') }}"
+                                class="text-sm text-gray-600 hover:text-gray-900 mr-4">Batal</a>
+                            <x-primary-button>Simpan</x-primary-button>
+                        </div>
+
                     </form>
                 </div>
             </div>

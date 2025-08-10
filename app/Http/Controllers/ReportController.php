@@ -20,7 +20,8 @@ class ReportController extends Controller
         // Ambil data Pemasukan dari booking yang sudah check-out
         $income = Booking::where('status', 'checked_out')
             ->whereBetween('check_out_date', [$startDate, $endDate])
-            ->sum('total_amount');
+            ->get()
+            ->sum('grand_total');
 
         // Ambil data Pengeluaran
         $expenses = Expense::whereBetween('expense_date', [$startDate, $endDate])->sum('amount');
