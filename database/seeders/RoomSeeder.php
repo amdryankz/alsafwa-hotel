@@ -15,7 +15,6 @@ class RoomSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Membuat Data Tipe Kamar (Room Types)
         $standardType = RoomType::create([
             'name' => 'Standard',
             'price_per_night' => 300000
@@ -33,11 +32,10 @@ class RoomSeeder extends Seeder
 
         $this->command->info('Room types created successfully!');
 
-        // 2. Membuat Data Kamar (Rooms) untuk setiap tipe
         for ($i = 1; $i <= 5; $i++) {
             Room::create([
                 'room_type_id' => $standardType->id,
-                'room_number' => '1' . str_pad($i, 2, '0', STR_PAD_LEFT), // Hasil: 101, 102, ... 110
+                'room_number' => '1' . str_pad($i, 2, '0', STR_PAD_LEFT),
                 'status' => 'available',
             ]);
         }
