@@ -18,7 +18,7 @@ test('grand total is calculated correctly', function () {
 });
 
 test('paid amount accessor sums payments correctly', function () {
-    $booking = new Booking();
+    $booking = new Booking;
 
     $payments = collect([
         new Payment(['amount' => 200000]),

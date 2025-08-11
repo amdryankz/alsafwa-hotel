@@ -22,7 +22,7 @@ class DashboardController extends Controller
             'checkInsToday' => $checkInsToday,
             'occupancyRate' => $occupancyRate,
             'occupiedRooms' => $occupiedRooms,
-            'totalRooms' => $totalRooms
+            'totalRooms' => $totalRooms,
         ]);
     }
 }

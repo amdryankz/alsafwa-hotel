@@ -48,7 +48,7 @@ class ReportController extends Controller
         $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : now()->startOfMonth();
         $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : now()->endOfMonth();
 
-        $fileName = 'laporan-keuangan-' . $startDate->format('d-m-Y') . '-' . $endDate->format('d-m-Y') . '.xlsx';
+        $fileName = 'laporan-keuangan-'.$startDate->format('d-m-Y').'-'.$endDate->format('d-m-Y').'.xlsx';
 
         return Excel::download(new FinancialReportExport($startDate, $endDate), $fileName);
     }

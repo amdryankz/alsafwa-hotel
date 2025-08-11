@@ -53,6 +53,7 @@ class Booking extends Model
     {
         $subtotalAfterDiscount = $this->total_amount - $this->discount;
         $taxAmount = $subtotalAfterDiscount * ($this->tax_percentage / 100);
+
         return $subtotalAfterDiscount + $taxAmount;
     }
 
@@ -64,7 +65,7 @@ class Booking extends Model
             // Tampilkan log jika ada atribut yang "kotor" atau berubah
             ->logOnlyDirty()
             // Pesan log yang akan ditampilkan
-            ->setDescriptionForEvent(fn(string $eventName) => "Transaksi Booking #{$this->id} telah di-{$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "Transaksi Booking #{$this->id} telah di-{$eventName}")
             // Mengelompokkan log berdasarkan nama
             ->useLogName('Transaksi');
     }

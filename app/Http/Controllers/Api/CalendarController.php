@@ -19,7 +19,7 @@ class CalendarController extends Controller
 
         foreach ($bookings as $booking) {
             $roomNumbers = $booking->rooms->pluck('room_number')->implode(', #');
-            $title = $booking->guest->name . ' - #' . $roomNumbers;
+            $title = $booking->guest->name.' - #'.$roomNumbers;
 
             $color = match ($booking->status) {
                 'booked' => '#3788d8',
@@ -38,7 +38,7 @@ class CalendarController extends Controller
                 'extendedProps' => [
                     'booking_id' => $booking->id,
                     'status' => Str::title(str_replace('_', ' ', $booking->status)),
-                ]
+                ],
             ];
         }
 

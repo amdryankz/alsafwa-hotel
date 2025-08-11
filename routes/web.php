@@ -61,4 +61,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/calendar-events', [CalendarController::class, 'events']);
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

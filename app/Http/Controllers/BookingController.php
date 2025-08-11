@@ -28,7 +28,7 @@ class BookingController extends Controller
             if ($startDate && $endDate) {
                 $query->whereBetween('check_out_date', [
                     Carbon::parse($startDate)->startOfDay(),
-                    Carbon::parse($endDate)->endOfDay()
+                    Carbon::parse($endDate)->endOfDay(),
                 ]);
             }
 
@@ -50,7 +50,6 @@ class BookingController extends Controller
             'endDate' => $endDate,
         ]);
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -112,10 +111,11 @@ class BookingController extends Controller
 
             DB::commit();
 
-            return redirect()->route('bookings.index')->with('success', 'Check-in untuk ' . $numberOfNights . ' malam berhasil dilakukan.');
+            return redirect()->route('bookings.index')->with('success', 'Check-in untuk '.$numberOfNights.' malam berhasil dilakukan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat check-in: ' . $e->getMessage())->withInput();
+
+            return back()->with('error', 'Terjadi kesalahan saat check-in: '.$e->getMessage())->withInput();
         }
     }
 
@@ -139,14 +139,14 @@ class BookingController extends Controller
     {
         $balance = $booking->grand_total - $booking->paid_amount;
         if ($balance > 0) {
-            return back()->with('error', 'Check-out gagal! Tagihan belum lunas. Sisa tagihan: Rp ' . number_format($balance));
+            return back()->with('error', 'Check-out gagal! Tagihan belum lunas. Sisa tagihan: Rp '.number_format($balance));
         }
 
         DB::beginTransaction();
         try {
             $booking->update([
                 'status' => 'checked_out',
-                'check_out_date' => now()
+                'check_out_date' => now(),
             ]);
 
             foreach ($booking->rooms as $room) {
@@ -154,10 +154,12 @@ class BookingController extends Controller
             }
 
             DB::commit();
+
             return redirect()->route('bookings.index')->with('success', 'Check-out berhasil.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+
+            return back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 
@@ -191,6 +193,7 @@ class BookingController extends Controller
         $checkInDate = Carbon::parse($checkIn)->startOfDay();
         $checkOutDate = Carbon::parse($checkOut)->startOfDay();
         $nights = $checkInDate->diffInDays($checkOutDate);
+
         return ($nights <= 0) ? 1 : $nights;
     }
 
@@ -222,10 +225,12 @@ class BookingController extends Controller
             $booking->rooms()->attach($newRoom->id, ['price_at_booking' => $newRoom->roomType->price_per_night]);
 
             DB::commit();
+
             return back()->with('success', "Tamu berhasil dipindahkan dari kamar #{$oldRoom->room_number} ke #{$newRoom->room_number}.");
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat proses pindah kamar: ' . $e->getMessage());
+
+            return back()->with('error', 'Terjadi kesalahan saat proses pindah kamar: '.$e->getMessage());
         }
     }
 
@@ -244,10 +249,12 @@ class BookingController extends Controller
             }
 
             DB::commit();
+
             return back()->with('success', 'Tamu berhasil check-in.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+
+            return back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 }

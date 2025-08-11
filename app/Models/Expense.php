@@ -27,7 +27,7 @@ class Expense extends Model
         return LogOptions::defaults()
             ->logOnly(['description', 'amount', 'expense_date'])
             ->logOnlyDirty()
-            ->setDescriptionForEvent(fn(string $eventName) => "Data Pengeluaran '{$this->description}' telah di-{$eventName}")
+            ->setDescriptionForEvent(fn (string $eventName) => "Data Pengeluaran '{$this->description}' telah di-{$eventName}")
             ->useLogName('Keuangan');
     }
 }

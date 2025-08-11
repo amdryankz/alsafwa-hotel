@@ -15,6 +15,7 @@ class ReservationController extends Controller
     {
         $guests = Guest::orderBy('name')->get();
         $rooms = Room::with('roomType')->get();
+
         return view('reservations.create', compact('guests', 'rooms'));
     }
 
@@ -41,6 +42,7 @@ class ReservationController extends Controller
 
         if ($unavailableRooms->isNotEmpty()) {
             $roomNumbers = $unavailableRooms->pluck('room_number')->implode(', ');
+
             return back()->with('error', "Kamar #{$roomNumbers} tidak tersedia pada rentang tanggal yang dipilih.")->withInput();
         }
 
@@ -68,7 +70,8 @@ class ReservationController extends Controller
             return redirect()->route('bookings.index')->with('success', 'Reservasi berhasil dibuat.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+
+            return back()->with('error', 'Terjadi kesalahan: '.$e->getMessage())->withInput();
         }
     }
 }

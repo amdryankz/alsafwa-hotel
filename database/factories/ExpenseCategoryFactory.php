@@ -17,7 +17,7 @@ class ExpenseCategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->unique()->word() . ' ' . $this->faker->randomElement(['Supplies', 'Utilities', 'Maintenance', 'Marketing']),
+            'name' => $this->faker->unique()->word().' '.$this->faker->randomElement(['Supplies', 'Utilities', 'Maintenance', 'Marketing']),
             'description' => $this->faker->boolean(70) ? $this->faker->sentence() : null,
             'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
             'updated_at' => $this->faker->dateTimeBetween('-1 year', 'now'),

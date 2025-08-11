@@ -33,7 +33,7 @@ test('staff can create a reservation for an available room', function () {
     ]);
 
     $this->assertDatabaseHas('booking_room', [
-        'room_id' => $this->room->id
+        'room_id' => $this->room->id,
     ]);
 
     $this->assertDatabaseHas('rooms', [
@@ -42,13 +42,12 @@ test('staff can create a reservation for an available room', function () {
     ]);
 });
 
-
 test('system prevents double booking on overlapping dates', function () {
     $booking1 = Booking::factory()->create([
         'guest_id' => $this->guest->id,
         'check_in_date' => Carbon::parse('2025-08-15 14:00:00'),
         'check_out_date' => Carbon::parse('2025-08-17 12:00:00'),
-        'status' => 'booked'
+        'status' => 'booked',
     ]);
     $booking1->rooms()->attach($this->room->id, ['price_at_booking' => 500000]);
 
@@ -71,7 +70,7 @@ test('staff can confirm a reservation and check in a guest', function () {
         'guest_id' => $this->guest->id,
         'check_in_date' => Carbon::parse('2025-08-15 14:00:00'),
         'check_out_date' => Carbon::parse('2025-08-17 12:00:00'),
-        'status' => 'booked'
+        'status' => 'booked',
     ]);
     $booking->rooms()->attach($this->room->id, ['price_at_booking' => 500000]);
 
@@ -83,12 +82,12 @@ test('staff can confirm a reservation and check in a guest', function () {
 
     $this->assertDatabaseHas('bookings', [
         'id' => $booking->id,
-        'status' => 'checked_in'
+        'status' => 'checked_in',
     ]);
 
     $this->assertDatabaseHas('rooms', [
         'id' => $this->room->id,
-        'status' => 'occupied'
+        'status' => 'occupied',
     ]);
 });
 
@@ -100,7 +99,7 @@ test('system prevents checkout if bill is not fully paid', function () {
         'status' => 'checked_in',
         'total_amount' => 1000000,
         'discount' => 0,
-        'tax_percentage' => 0
+        'tax_percentage' => 0,
     ]);
 
     $response = $this->actingAs($this->staff)

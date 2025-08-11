@@ -13,6 +13,7 @@ class RoomTypeController extends Controller
     public function index()
     {
         $roomTypes = RoomType::latest()->paginate(10);
+
         return view('room_types.index', compact('roomTypes'));
     }
 
@@ -62,7 +63,7 @@ class RoomTypeController extends Controller
     public function update(Request $request, RoomType $roomType)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:room_types,name,' . $roomType->id,
+            'name' => 'required|string|max:255|unique:room_types,name,'.$roomType->id,
             'price_per_night' => 'required|numeric|min:0',
             'description' => 'nullable|string',
         ]);
@@ -78,6 +79,7 @@ class RoomTypeController extends Controller
     public function destroy(RoomType $roomType)
     {
         $roomType->delete();
+
         return redirect()->route('room-types.index')->with('success', 'Tipe kamar berhasil dihapus.');
     }
 }

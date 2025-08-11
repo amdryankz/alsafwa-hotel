@@ -106,7 +106,7 @@ test('admin can update a user', function () {
         'role' => 'accountant',
     ];
 
-    $response = $this->actingAs($admin)->put('/users/' . $userToUpdate->id, $updatedData);
+    $response = $this->actingAs($admin)->put('/users/'.$userToUpdate->id, $updatedData);
 
     $response->assertRedirect('/users');
     $this->assertDatabaseHas('users', [
@@ -120,7 +120,7 @@ test('admin can delete another user', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $userToDelete = User::factory()->create();
 
-    $response = $this->actingAs($admin)->delete('/users/' . $userToDelete->id);
+    $response = $this->actingAs($admin)->delete('/users/'.$userToDelete->id);
 
     $response->assertRedirect('/users');
     $this->assertDatabaseMissing('users', [

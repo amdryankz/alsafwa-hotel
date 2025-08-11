@@ -4,9 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Room;
 use App\Models\RoomType;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class RoomSeeder extends Seeder
 {
@@ -17,17 +15,17 @@ class RoomSeeder extends Seeder
     {
         $standardType = RoomType::create([
             'name' => 'Standard',
-            'price_per_night' => 300000
+            'price_per_night' => 300000,
         ]);
 
         $deluxeType = RoomType::create([
             'name' => 'Deluxe',
-            'price_per_night' => 400000
+            'price_per_night' => 400000,
         ]);
 
         $superiorType = RoomType::create([
             'name' => 'Superior',
-            'price_per_night' => 350000
+            'price_per_night' => 350000,
         ]);
 
         $this->command->info('Room types created successfully!');
@@ -35,7 +33,7 @@ class RoomSeeder extends Seeder
         for ($i = 1; $i <= 5; $i++) {
             Room::create([
                 'room_type_id' => $standardType->id,
-                'room_number' => '1' . str_pad($i, 2, '0', STR_PAD_LEFT),
+                'room_number' => '1'.str_pad($i, 2, '0', STR_PAD_LEFT),
                 'status' => 'available',
             ]);
         }
@@ -43,7 +41,7 @@ class RoomSeeder extends Seeder
         for ($i = 6; $i <= 9; $i++) {
             Room::create([
                 'room_type_id' => $deluxeType->id,
-                'room_number' => '1' . str_pad($i, 2, '0', STR_PAD_LEFT),
+                'room_number' => '1'.str_pad($i, 2, '0', STR_PAD_LEFT),
                 'status' => 'available',
             ]);
         }
@@ -54,6 +52,6 @@ class RoomSeeder extends Seeder
             'status' => 'available',
         ]);
 
-        $this->command->info('Rooms created successfully!');;
+        $this->command->info('Rooms created successfully!');
     }
 }

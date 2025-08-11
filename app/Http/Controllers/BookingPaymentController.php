@@ -13,14 +13,14 @@ class BookingPaymentController extends Controller
         $validated = $request->validate([
             'amount' => 'required|numeric|min:1',
             'payment_method' => 'required|string',
-            'payment_date' => 'required|date'
+            'payment_date' => 'required|date',
         ]);
 
         $balance = $booking->grand_total - $booking->paid_amount;
 
         if ($validated['amount'] > $balance) {
             throw ValidationException::withMessages([
-                'amount' => 'Jumlah pembayaran melebihi sisa tagihan (Rp ' . number_format($balance) . ').'
+                'amount' => 'Jumlah pembayaran melebihi sisa tagihan (Rp '.number_format($balance).').',
             ]);
         }
 

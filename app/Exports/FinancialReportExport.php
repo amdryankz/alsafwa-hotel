@@ -4,21 +4,23 @@ namespace App\Exports;
 
 use App\Models\Expense;
 use App\Models\Payment;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Carbon\Carbon;
-use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
-use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
-class FinancialReportExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithEvents
+class FinancialReportExport implements FromCollection, ShouldAutoSize, WithEvents, WithHeadings, WithMapping
 {
     protected $startDate;
+
     protected $endDate;
+
     private $totalRows = 0;
 
     public function __construct($startDate, $endDate)
@@ -38,6 +40,7 @@ class FinancialReportExport implements FromCollection, WithHeadings, WithMapping
 
         $collection = $incomes->concat($expenses);
         $this->totalRows = $collection->count();
+
         return $collection;
     }
 
@@ -59,7 +62,7 @@ class FinancialReportExport implements FromCollection, WithHeadings, WithMapping
             return [
                 Carbon::parse($row->payment_date)->format('Y-m-d H:i'),
                 'Pemasukan',
-                'Pembayaran dari tamu: ' . $row->booking->guest->name . ' (Inv: #' . $row->booking_id . ')',
+                'Pembayaran dari tamu: '.$row->booking->guest->name.' (Inv: #'.$row->booking_id.')',
                 Str::title($row->payment_method),
                 $row->amount,
                 0,
@@ -75,6 +78,7 @@ class FinancialReportExport implements FromCollection, WithHeadings, WithMapping
                 $row->amount,
             ];
         }
+
         return [];
     }
 
@@ -95,7 +99,7 @@ class FinancialReportExport implements FromCollection, WithHeadings, WithMapping
                 $sheet->mergeCells('A3:F3');
                 $sheet->setCellValue('A1', 'Laporan Keuangan');
                 $sheet->setCellValue('A2', 'Hotel Hebat');
-                $sheet->setCellValue('A3', 'Periode: ' . Carbon::parse($this->startDate)->format('d M Y') . ' - ' . Carbon::parse($this->endDate)->format('d M Y'));
+                $sheet->setCellValue('A3', 'Periode: '.Carbon::parse($this->startDate)->format('d M Y').' - '.Carbon::parse($this->endDate)->format('d M Y'));
 
                 // Style untuk header laporan
                 $sheet->getStyle('A1:A3')->getFont()->setBold(true)->setSize(14);
@@ -109,15 +113,15 @@ class FinancialReportExport implements FromCollection, WithHeadings, WithMapping
 
                 // 3. Menambahkan baris Total di bawah
                 $sheet->setCellValue("D{$totalRow}", 'Total');
-                $sheet->setCellValue("E{$totalRow}", "=SUM(E" . ($headerRow + 1) . ":E{$lastDataRow})");
-                $sheet->setCellValue("F{$totalRow}", "=SUM(F" . ($headerRow + 1) . ":F{$lastDataRow})");
+                $sheet->setCellValue("E{$totalRow}", '=SUM(E'.($headerRow + 1).":E{$lastDataRow})");
+                $sheet->setCellValue("F{$totalRow}", '=SUM(F'.($headerRow + 1).":F{$lastDataRow})");
                 $sheet->getStyle("D{$totalRow}:{$lastColumn}{$totalRow}")->getFont()->setBold(true);
 
                 // 4. Memberi border pada seluruh tabel
                 $sheet->getStyle("A{$headerRow}:{$lastColumn}{$totalRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
                 // 5. Format Angka
-                $sheet->getStyle("E" . ($headerRow + 1) . ":F{$totalRow}")
+                $sheet->getStyle('E'.($headerRow + 1).":F{$totalRow}")
                     ->getNumberFormat()
                     ->setFormatCode('#,##0');
             },

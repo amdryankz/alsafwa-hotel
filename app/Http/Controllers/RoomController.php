@@ -14,6 +14,7 @@ class RoomController extends Controller
     public function index()
     {
         $rooms = Room::with('roomType')->latest()->paginate(10);
+
         return view('rooms.index', compact('rooms'));
     }
 
@@ -23,6 +24,7 @@ class RoomController extends Controller
     public function create()
     {
         $roomTypes = RoomType::all();
+
         return view('rooms.create', compact('roomTypes'));
     }
 
@@ -56,6 +58,7 @@ class RoomController extends Controller
     public function edit(Room $room)
     {
         $roomTypes = RoomType::all();
+
         return view('rooms.edit', compact('room', 'roomTypes'));
     }
 
@@ -66,7 +69,7 @@ class RoomController extends Controller
     {
         $validated = $request->validate([
             'room_type_id' => 'required|exists:room_types,id',
-            'room_number' => 'required|string|max:10|unique:rooms,room_number,' . $room->id,
+            'room_number' => 'required|string|max:10|unique:rooms,room_number,'.$room->id,
             'status' => 'required|in:available,occupied,maintenance',
         ]);
 
@@ -81,6 +84,7 @@ class RoomController extends Controller
     public function destroy(Room $room)
     {
         $room->delete();
+
         return redirect()->route('rooms.index')->with('success', 'Data kamar berhasil dihapus.');
     }
 }

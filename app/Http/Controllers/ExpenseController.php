@@ -14,6 +14,7 @@ class ExpenseController extends Controller
     public function index()
     {
         $expenses = Expense::with('category')->latest()->paginate(15);
+
         return view('expenses.index', compact('expenses'));
     }
 
@@ -23,6 +24,7 @@ class ExpenseController extends Controller
     public function create()
     {
         $categories = ExpenseCategory::orderBy('name')->get();
+
         return view('expenses.create', compact('categories'));
     }
 
@@ -39,6 +41,7 @@ class ExpenseController extends Controller
         ]);
 
         Expense::create($validated);
+
         return redirect()->route('expenses.index')->with('success', 'Data pengeluaran berhasil dicatat.');
     }
 
@@ -56,6 +59,7 @@ class ExpenseController extends Controller
     public function edit(Expense $expense)
     {
         $categories = ExpenseCategory::orderBy('name')->get();
+
         return view('expenses.edit', compact('expense', 'categories'));
     }
 
@@ -72,6 +76,7 @@ class ExpenseController extends Controller
         ]);
 
         $expense->update($validated);
+
         return redirect()->route('expenses.index')->with('success', 'Data pengeluaran berhasil diperbarui.');
     }
 
@@ -81,6 +86,7 @@ class ExpenseController extends Controller
     public function destroy(Expense $expense)
     {
         $expense->delete();
+
         return redirect()->route('expenses.index')->with('success', 'Data pengeluaran berhasil dihapus.');
     }
 }

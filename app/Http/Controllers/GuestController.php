@@ -79,7 +79,7 @@ class GuestController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'id_type' => 'required|in:KTP,Paspor',
-            'id_number' => 'required|string|unique:guests,id_number,' . $guest->id,
+            'id_number' => 'required|string|unique:guests,id_number,'.$guest->id,
             'phone_number' => 'nullable|string',
             'email' => 'nullable|email',
             'address' => 'nullable|string',
@@ -96,6 +96,7 @@ class GuestController extends Controller
     public function destroy(Guest $guest)
     {
         $guest->delete();
+
         return redirect()->route('guests.index')->with('success', 'Data tamu berhasil dihapus!');
     }
 }
