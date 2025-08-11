@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('booking_id')->constrained()->onDelete('cascade');
             $table->foreignId('room_id')->constrained()->onDelete('cascade');
-            $table->decimal('price_at_booking', 15, 2); // Simpan harga saat booking
+            $table->decimal('price_at_booking', 15, 2);
             $table->timestamps();
         });
     }

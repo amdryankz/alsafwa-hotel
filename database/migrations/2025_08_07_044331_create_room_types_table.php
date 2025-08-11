@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('room_types', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // e.g., Deluxe, Standard
+            $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('price_per_night', 15, 2); // Harga per malam
+            $table->decimal('price_per_night', 15, 2);
             $table->timestamps();
         });
     }

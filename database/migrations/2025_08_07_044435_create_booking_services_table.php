@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('booking_services', function (Blueprint $table) {
             $table->id();
             $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
-            $table->string('service_name'); // e.g., "Laundry Kemeja", "Extra Bed", "Makan Malam"
-            $table->decimal('price', 15, 2); // Harga layanan tersebut
-            $table->integer('quantity')->default(1); // Jumlah layanan, misal laundry 3 potong
+            $table->string('service_name');
+            $table->decimal('price', 15, 2);
+            $table->integer('quantity')->default(1);
             $table->timestamps();
         });
     }
