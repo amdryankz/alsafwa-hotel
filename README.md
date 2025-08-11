@@ -58,8 +58,8 @@ Untuk menjalankan proyek ini di lingkungan lokal, ikuti langkah-langkah berikut:
 1. **Clone repositori ini:**
 
    ```bash
-   git clone https://github.com/amd_ryankz/management-hotel.git
-   cd management-hotel
+   git clone https://github.com/amd_ryankz/management-hotel-app.git
+   cd management-hotel-app
    ```
 2. **Install dependensi PHP:**
 
