@@ -10,9 +10,12 @@
     </div>
 
     <header class="flex justify-between items-center mb-8 border-b pb-4">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800">Hotel Hebat</h1>
-            <p class="text-gray-500">Jl. Pembangunan No. 123, Medan</p>
+        <div class="flex items-center space-x-4">
+            <img class="h-16 w-auto" src="{{ asset('images/logo.png') }}" alt="Hotel Logo">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Al Safwa Hotel</h1>
+                <p class="text-gray-500">Blang Pulo, Kec. Muara Satu, Lhokseumawe</p>
+            </div>
         </div>
         <div class="text-right">
             <h2 class="text-2xl font-bold text-gray-700">INVOICE</h2>
@@ -131,6 +134,6 @@
     </section>
 
     <footer class="text-center text-gray-500 border-t pt-4 mt-8">
-        <p>Terima kasih telah menginap di Hotel Hebat.</p>
+        <p>Terima kasih telah menginap di Al Safwa Hotel.</p>
     </footer>
 @endsection
