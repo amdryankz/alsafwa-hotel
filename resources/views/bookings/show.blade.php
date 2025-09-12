@@ -97,6 +97,25 @@
                                         </div>
                                     </div>
                                 @endforeach
+
+                                @if ($booking->discount > 0)
+                                    <div class="py-3 flex justify-between text-sm font-medium">
+                                        <dt class="text-green-600 dark:text-green-400">Diskon</dt>
+                                        <dd class="text-green-600 dark:text-green-400">- Rp
+                                            {{ number_format($booking->discount) }}</dd>
+                                    </div>
+                                @endif
+
+                                @if ($booking->tax_percentage > 0)
+                                    <div class="py-3 flex justify-between text-sm font-medium">
+                                        <dt class="text-gray-600 dark:text-gray-300">PPN
+                                            ({{ $booking->tax_percentage }}%)</dt>
+                                        <dd class="text-gray-900 dark:text-white">Rp
+                                            {{ number_format(($booking->rooms->sum(fn($room) => $room->pivot->price_at_booking * $nights) - $booking->discount) * ($booking->tax_percentage / 100)) }}
+                                        </dd>
+                                    </div>
+                                @endif
+
                                 @foreach ($booking->services as $service)
                                     <div class="py-3 flex justify-between text-sm">
                                         <dt class="text-gray-500 dark:text-gray-400">{{ $service->service_name }}
@@ -107,27 +126,6 @@
                                     </div>
                                 @endforeach
 
-                                <div class="py-3 flex justify-between text-sm font-medium">
-                                    <dt class="text-gray-600 dark:text-gray-300">Subtotal</dt>
-                                    <dd class="text-gray-900 dark:text-white">Rp
-                                        {{ number_format($booking->total_amount) }}</dd>
-                                </div>
-                                @if ($booking->discount > 0)
-                                    <div class="py-3 flex justify-between text-sm font-medium">
-                                        <dt class="text-green-600 dark:text-green-400">Diskon</dt>
-                                        <dd class="text-green-600 dark:text-green-400">- Rp
-                                            {{ number_format($booking->discount) }}</dd>
-                                    </div>
-                                @endif
-                                @if ($booking->tax_percentage > 0)
-                                    <div class="py-3 flex justify-between text-sm font-medium">
-                                        <dt class="text-gray-600 dark:text-gray-300">PPN
-                                            ({{ $booking->tax_percentage }}%)</dt>
-                                        <dd class="text-gray-900 dark:text-white">+ Rp
-                                            {{ number_format(($booking->total_amount - $booking->discount) * ($booking->tax_percentage / 100)) }}
-                                        </dd>
-                                    </div>
-                                @endif
                                 <div
                                     class="py-3 flex justify-between text-base font-bold text-gray-900 dark:text-white">
                                     <dt>Grand Total</dt>
