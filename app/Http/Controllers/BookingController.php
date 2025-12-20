@@ -111,11 +111,11 @@ class BookingController extends Controller
 
             DB::commit();
 
-            return redirect()->route('bookings.index')->with('success', 'Check-in untuk '.$numberOfNights.' malam berhasil dilakukan.');
+            return redirect()->route('bookings.index')->with('success', 'Check-in untuk ' . $numberOfNights . ' malam berhasil dilakukan.');
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Terjadi kesalahan saat check-in: '.$e->getMessage())->withInput();
+            return back()->with('error', 'Terjadi kesalahan saat check-in: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -139,7 +139,7 @@ class BookingController extends Controller
     {
         $balance = $booking->grand_total - $booking->paid_amount;
         if ($balance > 0) {
-            return back()->with('error', 'Check-out gagal! Tagihan belum lunas. Sisa tagihan: Rp '.number_format($balance));
+            return back()->with('error', 'Check-out gagal! Tagihan belum lunas. Sisa tagihan: Rp ' . number_format($balance));
         }
 
         DB::beginTransaction();
@@ -159,7 +159,7 @@ class BookingController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
@@ -185,7 +185,10 @@ class BookingController extends Controller
         $booking->load(['guest', 'rooms.roomType', 'services', 'payments']);
         $nights = $this->calculateNights($booking->check_in_date, $booking->check_out_date);
 
-        return view('bookings.print', compact('booking', 'nights'));
+        $roomTotal = $booking->rooms->sum(fn($room) => $room->pivot->price_at_booking * $nights);
+        $serviceTotal = $booking->services->sum(fn($service) => $service->price * $service->quantity);
+
+        return view('bookings.print', compact('booking', 'nights', 'roomTotal', 'serviceTotal'));
     }
 
     private function calculateNights($checkIn, $checkOut)
@@ -230,7 +233,7 @@ class BookingController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Terjadi kesalahan saat proses pindah kamar: '.$e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat proses pindah kamar: ' . $e->getMessage());
         }
     }
 
@@ -254,7 +257,7 @@ class BookingController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }

@@ -55,12 +55,6 @@
                         <td class="p-3 text-right">Rp {{ number_format($room->pivot->price_at_booking * $nights) }}</td>
                     </tr>
                 @endforeach
-                @foreach ($booking->services as $service)
-                    <tr class="border-b">
-                        <td class="p-3">{{ $service->service_name }} x {{ $service->quantity }}</td>
-                        <td class="p-3 text-right">Rp {{ number_format($service->price * $service->quantity) }}</td>
-                    </tr>
-                @endforeach
             </tbody>
         </table>
     </section>
@@ -70,22 +64,33 @@
             <table class="w-full">
                 <tbody>
                     <tr>
-                        <td class="p-2">Subtotal</td>
-                        <td class="p-2 text-right">Rp {{ number_format($booking->total_amount) }}</td>
+                        <td class="p-2">Total Harga Kamar</td>
+                        <td class="p-2 text-right">Rp {{ number_format($roomTotal) }}</td>
                     </tr>
                     @if ($booking->discount > 0)
                         <tr>
-                            <td class="p-2">Diskon</td>
-                            <td class="p-2 text-right">- Rp {{ number_format($booking->discount) }}</td>
+                            <td class="p-2">Diskon (Kamar)</td>
+                            <td class="p-2 text-right text-green-600">- Rp {{ number_format($booking->discount) }}</td>
                         </tr>
                     @endif
                     @if ($booking->tax_percentage > 0)
                         <tr>
                             <td class="p-2">PPN ({{ $booking->tax_percentage }}%)</td>
                             <td class="p-2 text-right">+ Rp
-                                {{ number_format(($booking->total_amount - $booking->discount) * ($booking->tax_percentage / 100)) }}
+                                {{ number_format(($roomTotal - $booking->discount) * ($booking->tax_percentage / 100)) }}
                             </td>
                         </tr>
+                    @endif
+                    @if ($serviceTotal > 0)
+                        @foreach ($booking->services as $service)
+                            <tr class="border-t">
+                                <td class="p-2">Layanan Tambahan
+                                    <span class="block text-xs text-gray-500">{{ $service->service_name }} x
+                                        {{ $service->quantity }}</span>
+                                </td>
+                                <td class="p-2 text-right">Rp {{ number_format($service->price * $service->quantity) }}
+                            </tr>
+                        @endforeach
                     @endif
                     <tr class="font-bold text-lg border-t-2 border-gray-300">
                         <td class="p-2">Grand Total</td>
@@ -96,42 +101,41 @@
         </div>
     </section>
 
-    <section>
-        <h3 class="font-bold text-gray-700 mb-2">Rincian Pembayaran</h3>
-        <table class="w-full text-left text-sm">
-            <thead class="bg-gray-200">
-                <tr>
-                    <th class="p-2">Tanggal</th>
-                    <th class="p-2">Metode</th>
-                    <th class="p-2 text-right">Jumlah</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($booking->payments as $payment)
-                    <tr class="border-b">
-                        <td class="p-2">{{ \Carbon\Carbon::parse($payment->payment_date)->format('d M Y') }}</td>
-                        <td class="p-2">{{ Str::title($payment->payment_method) }}</td>
-                        <td class="p-2 text-right">Rp {{ number_format($payment->amount) }}</td>
-                    </tr>
-                @empty
+    @if ($booking->payments->isNotEmpty())
+        <section>
+            <h3 class="font-bold text-gray-700 mb-2">Rincian Pembayaran</h3>
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-200">
                     <tr>
-                        <td colspan="3" class="p-2 text-center text-gray-500">Belum ada pembayaran</td>
+                        <th class="p-2">Tanggal</th>
+                        <th class="p-2">Metode</th>
+                        <th class="p-2 text-right">Jumlah</th>
                     </tr>
-                @endforelse
-            </tbody>
-            <tfoot class="font-bold">
-                <tr>
-                    <td colspan="2" class="p-2 border-t-2 border-gray-300">Total Dibayar</td>
-                    <td class="p-2 border-t-2 border-gray-300 text-right">Rp {{ number_format($booking->paid_amount) }}
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" class="p-2">Sisa Tagihan</td>
-                    <td class="p-2 text-right">Rp {{ number_format($booking->grand_total - $booking->paid_amount) }}</td>
-                </tr>
-            </tfoot>
-        </table>
-    </section>
+                </thead>
+                <tbody>
+                    @foreach ($booking->payments as $payment)
+                        <tr class="border-b">
+                            <td class="p-2">{{ \Carbon\Carbon::parse($payment->payment_date)->format('d M Y') }}</td>
+                            <td class="p-2">{{ Str::title($payment->payment_method) }}</td>
+                            <td class="p-2 text-right">Rp {{ number_format($payment->amount) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+                <tfoot class="font-bold">
+                    <tr>
+                        <td colspan="2" class="p-2 border-t-2 border-gray-300">Total Dibayar</td>
+                        <td class="p-2 border-t-2 border-gray-300 text-right">Rp {{ number_format($booking->paid_amount) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="p-2">Sisa Tagihan</td>
+                        <td class="p-2 text-right">Rp {{ number_format($booking->grand_total - $booking->paid_amount) }}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </section>
+    @endif
 
     <footer class="text-center text-gray-500 border-t pt-4 mt-8">
         <p>Terima kasih telah menginap di Al Safwa Hotel.</p>
